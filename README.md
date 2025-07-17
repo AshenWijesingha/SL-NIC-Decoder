@@ -2,7 +2,9 @@
 
 A beautifully designed web application that decodes Sri Lankan National Identity Card (NIC) numbers. Enter either an **old 10-digit** or **new 12-digit** NIC and instantly retrieve the holder’s **date of birth**, **gender**, **day of the week**, **NIC format**, and **voter eligibility**.
 <div align="center">
-![Preview](preview.png) <!-- Replace with your preview image URL -->
+  
+[Preview](preview.png) <!-- Replace with your preview image URL -->
+
 </div>
 ---
 
