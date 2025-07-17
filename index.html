@@ -527,8 +527,12 @@
             }
 
             dayNumberToDate(dayNumber, year) {
+    // For old NIC format, day 1 = January 1st
+    // For new NIC format, day 1 = January 1st
+    // But we need to subtract 1 from dayNumber for proper calculation
+    
     const date = new Date(year, 0, 1); // Start with January 1st
-    date.setDate(dayNumber); // Add the day number (this will automatically handle month rollover)
+    date.setDate(date.getDate() + dayNumber - 1); // Add (dayNumber - 1) days
     
     // Format as YYYY-MM-DD to avoid timezone issues
     const month = (date.getMonth() + 1).toString().padStart(2, '0');
