@@ -527,14 +527,14 @@
             }
 
             dayNumberToDate(dayNumber, year) {
-    // For old NIC format, day 1 = January 1st
-    // For new NIC format, day 1 = January 1st
-    // But we need to subtract 1 from dayNumber for proper calculation
+    // Create January 1st of the given year
+    const date = new Date(year, 0, 1);
     
-    const date = new Date(year, 0, 1); // Start with January 1st
-    date.setDate(date.getDate() + dayNumber - 1); // Add (dayNumber - 1) days
+    // Add (dayNumber - 1) days to get the correct date
+    // We subtract 1 because dayNumber 1 should be January 1st (not January 2nd)
+    date.setDate(date.getDate() + (dayNumber - 1));
     
-    // Format as YYYY-MM-DD to avoid timezone issues
+    // Format as YYYY-MM-DD
     const month = (date.getMonth() + 1).toString().padStart(2, '0');
     const day = date.getDate().toString().padStart(2, '0');
     
