@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sri Lankan NIC Decoder</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .glass-effect {
+            backdrop-filter: blur(20px);
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+        
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #ffffff;
+            border-radius: 50%;
+            border-top-color: transparent;
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.6s ease-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .pulse-animation {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        
+        .floating {
+            animation: floating 3s ease-in-out infinite;
+        }
+        
+        @keyframes floating {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .success-checkmark {
+            animation: checkmark 0.5s ease-in-out;
+        }
+        
+        @keyframes checkmark {
+            0% { transform: scale(0); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+        
+        .gender-male {
+            background: linear-gradient(135deg, #3B82F6, #1E40AF);
+        }
+        
+        .gender-female {
+            background: linear-gradient(135deg, #EC4899, #BE185D);
+        }
+        
+        .input-focus {
+            transition: all 0.3s ease;
+        }
+        
+        .input-focus:focus {
+            transform: scale(1.02);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+        
+        .tooltip {
+            position: relative;
+        }
+        
+        .tooltip:hover .tooltip-text {
+            visibility: visible;
+            opacity: 1;
+        }
+        
+        .tooltip-text {
+            visibility: hidden;
+            opacity: 0;
+            position: absolute;
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            white-space: nowrap;
+            transition: all 0.3s;
+            z-index: 1000;
+        }
+        
+        .tooltip-text::after {
+            content: "";
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            border: 5px solid transparent;
+            border-top-color: rgba(0, 0, 0, 0.8);
+        }
+        
+        .progress-bar {
+            width: 0%;
+            height: 3px;
+            background: linear-gradient(90deg, #3B82F6, #8B5CF6);
+            transition: width 0.5s ease;
+            border-radius: 2px;
+        }
+        
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .badge-old {
+            background: linear-gradient(135deg, #F59E0B, #D97706);
+            color: white;
+        }
+        
+        .badge-new {
+            background: linear-gradient(135deg, #10B981, #047857);
+            color: white;
+        }
+        
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.6);
+            border-radius: 50%;
+            animation: float 6s infinite ease-in-out;
+            pointer-events: none;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            33% { transform: translateY(-20px) rotate(120deg); }
+            66% { transform: translateY(-10px) rotate(240deg); }
+        }
+    </style>
+</head>
+<body class="gradient-bg min-h-screen relative overflow-x-hidden">
+    <!-- Animated Background Particles -->
+    <div class="fixed inset-0 pointer-events-none">
+        <div class="particle" style="left: 10%; animation-delay: 0s;"></div>
+        <div class="particle" style="left: 20%; animation-delay: 1s;"></div>
+        <div class="particle" style="left: 30%; animation-delay: 2s;"></div>
+        <div class="particle" style="left: 40%; animation-delay: 3s;"></div>
+        <div class="particle" style="left: 50%; animation-delay: 4s;"></div>
+        <div class="particle" style="left: 60%; animation-delay: 5s;"></div>
+        <div class="particle" style="left: 70%; animation-delay: 0.5s;"></div>
+        <div class="particle" style="left: 80%; animation-delay: 1.5s;"></div>
+        <div class="particle" style="left: 90%; animation-delay: 2.5s;"></div>
+    </div>
+
+    <div class="container mx-auto px-4 py-8 relative z-10">
+        <!-- Title Section -->
+        <div class="text-center mb-12 floating">
+            <h1 class="text-5xl md:text-6xl font-bold text-white mb-4 drop-shadow-lg">
+                Sri Lankan - NIC Decoder
+            </h1>
+            <p class="text-xl text-white/80 max-w-2xl mx-auto">
+                Decode Sri Lankan National Identity Card numbers instantly and accurately
+            </p>
+            <div class="progress-bar mt-4 mx-auto max-w-xs" id="progressBar"></div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="max-w-2xl mx-auto">
+            <!-- Input Form -->
+            <div class="glass-effect rounded-3xl p-8 mb-6 card-hover fade-in">
+                <form id="nicForm" class="space-y-6">
+                    <div>
+                        <label for="nicInput" class="block text-sm font-medium text-white mb-3 flex items-center gap-2">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2M15 11h3m-3 4h2"></path>
+                            </svg>
+                            Enter NIC Number
+                        </label>
+                        <div class="relative">
+                            <input
+                                type="text"
+                                id="nicInput"
+                                placeholder="e.g., 831234567V or 199263400123"
+                                class="w-full px-6 py-4 bg-white/10 border border-white/20 rounded-xl focus:ring-2 focus:ring-white/50 focus:border-white/50 transition-all duration-300 text-white placeholder-white/60 text-lg input-focus backdrop-blur-sm"
+                                autocomplete="off"
+                            />
+                            <div class="absolute right-4 top-1/2 transform -translate-y-1/2">
+                                <svg class="w-6 h-6 text-white/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                            </div>
+                        </div>
+                        <div id="errorMessage" class="hidden mt-3 text-red-300 text-sm bg-red-500/20 border border-red-500/30 rounded-lg p-3 flex items-center gap-2">
+                            <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            <span id="errorText"></span>
+                        </div>
+                    </div>
+                    
+                    <button
+                        type="submit"
+                        id="decodeButton"
+                        class="w-full bg-white/20 hover:bg-white/30 text-white font-semibold py-4 px-8 rounded-xl transition-all duration-300 transform hover:scale-105 backdrop-blur-sm border border-white/30 hover:border-white/50 flex items-center justify-center gap-3 group"
+                    >
+                        <svg class="w-5 h-5 group-hover:rotate-12 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                        </svg>
+                        <span id="buttonText">Decode NIC</span>
+                    </button>
+                </form>
+            </div>
+
+            <!-- Example NICs -->
+            <div class="glass-effect rounded-3xl p-6 mb-6 card-hover fade-in">
+                <h3 class="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                    </svg>
+                    Quick Test Examples
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <button class="example-nic bg-white/10 hover:bg-white/20 text-white px-4 py-3 rounded-xl text-sm transition-all duration-300 transform hover:scale-105 backdrop-blur-sm border border-white/20 hover:border-white/40 flex items-center justify-between group" data-nic="831234567V">
+                        <span>831234567V</span>
+                        <span class="badge badge-old">Old</span>
+                    </button>
+                    <button class="example-nic bg-white/10 hover:bg-white/20 text-white px-4 py-3 rounded-xl text-sm transition-all duration-300 transform hover:scale-105 backdrop-blur-sm border border-white/20 hover:border-white/40 flex items-center justify-between group" data-nic="199263400123">
+                        <span>199263400123</span>
+                        <span class="badge badge-new">New</span>
+                    </button>
+                    <button class="example-nic bg-white/10 hover:bg-white/20 text-white px-4 py-3 rounded-xl text-sm transition-all duration-300 transform hover:scale-105 backdrop-blur-sm border border-white/20 hover:border-white/40 flex items-center justify-between group" data-nic="947851234V">
+                        <span>947851234V</span>
+                        <span class="badge badge-old">Old ♀</span>
+                    </button>
+                    <button class="example-nic bg-white/10 hover:bg-white/20 text-white px-4 py-3 rounded-xl text-sm transition-all duration-300 transform hover:scale-105 backdrop-blur-sm border border-white/20 hover:border-white/40 flex items-center justify-between group" data-nic="200015600789">
+                        <span>200015600789</span>
+                        <span class="badge badge-new">New ♀</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Success Message -->
+            <div id="successMessage" class="hidden glass-effect rounded-3xl p-6 mb-6 card-hover fade-in">
+                <div class="flex items-center gap-3 text-green-300">
+                    <div class="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center success-checkmark">
+                        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 class="font-semibold">Successfully Decoded!</h3>
+                        <p class="text-sm text-white/70">Your NIC information has been processed</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Results Section -->
+            <div id="resultsSection" class="hidden glass-effect rounded-3xl p-8 card-hover fade-in">
+                <div class="text-center mb-8">
+                    <h2 class="text-3xl font-bold text-white mb-2 flex items-center justify-center gap-3">
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        Decoded Information
+                    </h2>
+                    <p class="text-white/70">Complete details extracted from your NIC</p>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- NIC Number -->
+                    <div class="bg-white/10 rounded-2xl p-6 backdrop-blur-sm border border-white/20 hover:bg-white/15 transition-all duration-300">
+                        <div class="flex items-center gap-3 mb-3">
+                            <div class="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center">
+                                <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 4V2a1 1 0 011-1h8a1 1 0 011 1v2m0 0V1a1 1 0 011-1h2a1 1 0 011 1v18a1 1 0 01-1 1H4a1 1 0 01-1-1V4a1 1 0 011-1h2a1 1 0 011 1z"></path>
+                                </svg>
+                            </div>
+                            <h3 class="text-sm font-medium text-white/70 uppercase tracking-wide">NIC Number</h3>
+                        </div>
+                        <p id="displayNIC" class="text-2xl font-bold text-white font-mono"></p>
+                        <div id="nicFormat" class="mt-2"></div>
+                    </div>
+                    
+                    <!-- Year of Birth -->
+                    <div class="bg-white/10 rounded-2xl p-6 backdrop-blur-sm border border-white/20 hover:bg-white/15 transition-all duration-300">
+                        <div class="flex items-center gap-3 mb-3">
+                            <div class="w-10 h-10 bg-purple-500 rounded-full flex items-center justify-center">
+                                <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3a1 1 0 011-1h6a1 1 0 011 1v4m-8 0h8m-8 0v10a2 2 0 002 2h4a2 2 0 002-2V7"></path>
+                                </svg>
+                            </div>
+                            <h3 class="text-sm font-medium text-white/70 uppercase tracking-wide">Year of Birth</h3>
+                        </div>
+                        <p id="displayYear" class="text-2xl font-bold text-white"></p>
+                        <p id="displayAge" class="text-sm text-white/70 mt-1"></p>
+                    </div>
+                    
+                    <!-- Date of Birth -->
+                    <div class="bg-white/10 rounded-2xl p-6 backdrop-blur-sm border border-white/20 hover:bg-white/15 transition-all duration-300">
+                        <div class="flex items-center gap-3 mb-3">
+                            <div class="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center">
+                                <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3a1 1 0 011-1h6a1 1 0 011 1v4m-8 0h8m-8 0v10a2 2 0 002 2h4a2 2 0 002-2V7m-8 0V7a2 2 0 012-2h4a2 2 0 012 2v0"></path>
+                                </svg>
+                            </div>
+                            <h3 class="text-sm font-medium text-white/70 uppercase tracking-wide">Date of Birth</h3>
+                        </div>
+                        <p id="displayDate" class="text-2xl font-bold text-white"></p>
+                        <p id="displayDayOfWeek" class="text-sm text-white/70 mt-1"></p>
+                    </div>
+                    
+                    <!-- Gender -->
+                    <div class="bg-white/10 rounded-2xl p-6 backdrop-blur-sm border border-white/20 hover:bg-white/15 transition-all duration-300">
+                        <div class="flex items-center gap-3 mb-3">
+                            <div id="genderIcon" class="w-10 h-10 rounded-full flex items-center justify-center">
+                                <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                                </svg>
+                            </div>
+                            <h3 class="text-sm font-medium text-white/70 uppercase tracking-wide">Gender</h3>
+                        </div>
+                        <p id="displayGender" class="text-2xl font-bold text-white"></p>
+                    </div>
+                    
+                    <!-- Voter Eligibility -->
+                    <div id="voterEligibilitySection" class="bg-white/10 rounded-2xl p-6 backdrop-blur-sm border border-white/20 hover:bg-white/15 transition-all duration-300 md:col-span-2">
+                        <div class="flex items-center gap-3 mb-3">
+                            <div class="w-10 h-10 bg-orange-500 rounded-full flex items-center justify-center">
+                                <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                            </div>
+                            <h3 class="text-sm font-medium text-white/70 uppercase tracking-wide">Voter Eligibility</h3>
+                        </div>
+                        <p id="displayVoterEligibility" class="text-2xl font-bold text-white"></p>
+                        <p class="text-sm text-white/70 mt-1">Based on NIC format indicator</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class NICDecoder {
+            constructor() {
+                this.form = document.getElementById('nicForm');
+                this.input = document.getElementById('nicInput');
+                this.errorMessage = document.getElementById('errorMessage');
+                this.errorText = document.getElementById('errorText');
+                this.resultsSection = document.getElementById('resultsSection');
+                this.successMessage = document.getElementById('successMessage');
+                this.voterEligibilitySection = document.getElementById('voterEligibilitySection');
+                this.decodeButton = document.getElementById('decodeButton');
+                this.buttonText = document.getElementById('buttonText');
+                this.progressBar = document.getElementById('progressBar');
+                
+                this.init();
+            }
+
+            init() {
+                this.form.addEventListener('submit', (e) => this.handleSubmit(e));
+                
+                // Handle example NIC buttons
+                document.querySelectorAll('.example-nic').forEach(button => {
+                    button.addEventListener('click', (e) => {
+                        const nic = e.target.closest('.example-nic').getAttribute('data-nic');
+                        this.input.value = nic;
+                        this.hideError();
+                        this.updateProgressBar(25);
+                    });
+                });
+
+                // Input validation on type
+                this.input.addEventListener('input', (e) => {
+                    const value = e.target.value;
+                    if (value.length > 0) {
+                        this.updateProgressBar(50);
+                    } else {
+                        this.updateProgressBar(0);
+                    }
+                });
+            }
+
+            updateProgressBar(percentage) {
+                this.progressBar.style.width = percentage + '%';
+            }
+
+            async handleSubmit(e) {
+                e.preventDefault();
+                const nicNumber = this.input.value.trim().toUpperCase();
+                
+                if (!nicNumber) {
+                    this.showError('Please enter a NIC number');
+                    this.updateProgressBar(0);
+                    return;
+                }
+
+                this.showLoading();
+                this.updateProgressBar(75);
+
+                try {
+                    // Simulate processing delay for better UX
+                    await new Promise(resolve => setTimeout(resolve, 800));
+                    
+                    const result = this.decodeNIC(nicNumber);
+                    this.updateProgressBar(100);
+                    this.displayResults(result);
+                    this.hideError();
+                    this.showSuccess();
+                } catch (error) {
+                    this.showError(error.message);
+                    this.hideResults();
+                    this.updateProgressBar(0);
+                } finally {
+                    this.hideLoading();
+                }
+            }
+
+            showLoading() {
+                this.decodeButton.disabled = true;
+                this.buttonText.innerHTML = '<div class="loading"></div> Processing...';
+                this.decodeButton.classList.add('opacity-75');
+            }
+
+            hideLoading() {
+                this.decodeButton.disabled = false;
+                this.buttonText.textContent = 'Decode NIC';
+                this.decodeButton.classList.remove('opacity-75');
+            }
+
+            showSuccess() {
+                this.successMessage.classList.remove('hidden');
+                setTimeout(() => {
+                    this.successMessage.classList.add('hidden');
+                }, 3000);
+            }
+
+            decodeNIC(nicNumber) {
+                const oldNICPattern = /^(\d{2})(\d{3})(\d{4})([VX])$/;
+                const newNICPattern = /^(\d{4})(\d{3})(\d{5})$/;
+
+                let isOldFormat = false;
+                let year, dayNumber, lastDigits, voterEligibility;
+
+                if (oldNICPattern.test(nicNumber)) {
+                    isOldFormat = true;
+                    const match = nicNumber.match(oldNICPattern);
+                    year = 1900 + parseInt(match[1]);
+                    dayNumber = parseInt(match[2]);
+                    lastDigits = match[3];
+                    voterEligibility = match[4] === 'V' ? 'Eligible to Vote' : 'Not Eligible to Vote';
+                } else if (newNICPattern.test(nicNumber)) {
+                    const match = nicNumber.match(newNICPattern);
+                    year = parseInt(match[1]);
+                    dayNumber = parseInt(match[2]);
+                    lastDigits = match[3];
+                    voterEligibility = null;
+                } else {
+                    throw new Error('Invalid NIC format. Please enter a valid 10-digit (old) or 12-digit (new) NIC number.');
+                }
+
+                if (year < 1900 || year > new Date().getFullYear()) {
+                    throw new Error('Invalid year of birth detected');
+                }
+
+                const isFemale = dayNumber > 500;
+                const actualDayNumber = isFemale ? dayNumber - 500 : dayNumber;
+
+                if (actualDayNumber < 1 || actualDayNumber > 366) {
+                    throw new Error('Invalid day number detected');
+                }
+
+                const birthDate = this.dayNumberToDate(actualDayNumber, year);
+                const age = this.calculateAge(birthDate);
+
+                return {
+                    nicNumber,
+                    year,
+                    birthDate,
+                    age,
+                    gender: isFemale ? 'Female' : 'Male',
+                    voterEligibility,
+                    isOldFormat
+                };
+            }
+
+            dayNumberToDate(dayNumber, year) {
+                const date = new Date(year, 0, dayNumber);
+                return date.toISOString().split('T')[0];
+            }
+
+            calculateAge(birthDate) {
+                const today = new Date();
+                const birth = new Date(birthDate);
+                let age = today.getFullYear() - birth.getFullYear();
+                const monthDiff = today.getMonth() - birth.getMonth();
+                
+                if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
+                    age--;
+                }
+                
+                return age;
+            }
+
+            getDayOfWeek(dateString) {
+                const date = new Date(dateString);
+                const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+                return days[date.getDay()];
+            }
+
+            formatDate(dateString) {
+                const date = new Date(dateString);
+                const months = ['January', 'February', 'March', 'April', 'May', 'June', 
+                              'July', 'August', 'September', 'October', 'November', 'December'];
+                
+                return `${months[date.getMonth()]} ${date.getDate()}, ${date.getFullYear()}`;
+            }
+
+            displayResults(result) {
+                document.getElementById('displayNIC').textContent = result.nicNumber;
+                document.getElementById('displayYear').textContent = result.year;
+                document.getElementById('displayDate').textContent = this.formatDate(result.birthDate);
+                document.getElementById('displayGender').textContent = result.gender;
+                
+                // Display additional information
+                document.getElementById('displayAge').textContent = `${result.age} years old`;
+                document.getElementById('displayDayOfWeek').textContent = `Born on a ${this.getDayOfWeek(result.birthDate)}`;
+                
+                // Set NIC format badge
+                const nicFormatEl = document.getElementById('nicFormat');
+                if (result.isOldFormat) {
+                    nicFormatEl.innerHTML = '<span class="badge badge-old">Old Format</span>';
+                } else {
+                    nicFormatEl.innerHTML = '<span class="badge badge-new">New Format</span>';
+                }
+                
+                // Set gender icon color
+                const genderIcon = document.getElementById('genderIcon');
+                if (result.gender === 'Female') {
+                    genderIcon.className = 'w-10 h-10 rounded-full flex items-center justify-center gender-female';
+                } else {
+                    genderIcon.className = 'w-10 h-10 rounded-full flex items-center justify-center gender-male';
+                }
+                
+                // Display voter eligibility
+                if (result.isOldFormat) {
+                    document.getElementById('displayVoterEligibility').textContent = result.voterEligibility;
+                    this.voterEligibilitySection.classList.remove('hidden');
+                } else {
+                    this.voterEligibilitySection.classList.add('hidden');
+                }
+                
+                this.resultsSection.classList.remove('hidden');
+                setTimeout(() => {
+                    this.resultsSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }, 100);
+            }
+
+            showError(message) {
+                this.errorText.textContent = message;
+                this.errorMessage.classList.remove('hidden');
+                this.input.classList.add('border-red-500/50', 'focus:border-red-500', 'focus:ring-red-500/20');
+                
+                // Shake animation
+                this.input.style.animation = 'shake 0.5s ease-in-out';
+                setTimeout(() => {
+                    this.input.style.animation = '';
+                }, 500);
+            }
+
+            hideError() {
+                this.errorMessage.classList.add('hidden');
+                this.input.classList.remove('border-red-500/50', 'focus:border-red-500', 'focus:ring-red-500/20');
+            }
+
+            hideResults() {
+                this.resultsSection.classList.add('hidden');
+                this.successMessage.classList.add('hidden');
+            }
+        }
+
+        // Add shake animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes shake {
+                0%, 100% { transform: translateX(0); }
+                25% { transform: translateX(-5px); }
+                75% { transform: translateX(5px); }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Initialize the NIC Decoder when the page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            new NICDecoder();
+        });
+    </script>
+</body>
+</html>
