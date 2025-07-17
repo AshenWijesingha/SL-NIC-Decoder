@@ -527,9 +527,15 @@
             }
 
             dayNumberToDate(dayNumber, year) {
-                const date = new Date(year, 0, dayNumber);
-                return date.toISOString().split('T')[0];
-            }
+    const date = new Date(year, 0, 1); // Start with January 1st
+    date.setDate(dayNumber); // Add the day number (this will automatically handle month rollover)
+    
+    // Format as YYYY-MM-DD to avoid timezone issues
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const day = date.getDate().toString().padStart(2, '0');
+    
+    return `${year}-${month}-${day}`;
+}
 
             calculateAge(birthDate) {
                 const today = new Date();
