@@ -527,17 +527,28 @@
             }
 
             dayNumberToDate(dayNumber, year) {
+    // Validate leap year
+    const isLeapYear = (year % 4 === 0 && year % 100 !== 0) || (year % 400 === 0);
+    const maxDays = isLeapYear ? 366 : 365;
+    if (dayNumber < 1 || dayNumber > maxDays) {
+        throw new Error(`Invalid day number ${dayNumber} for year ${year}`);
+    }
+
     // Create January 1st of the given year
     const date = new Date(year, 0, 1);
-    
-    // Add (dayNumber - 1) days to get the correct date
-    // We subtract 1 because dayNumber 1 should be January 1st (not January 2nd)
-    date.setDate(date.getDate() + (dayNumber - 1));
-    
+
+    // Add dayNumber days to get the correct date
+    date.setDate(date.getDate() + dayNumber);
+
+    // Validate the resulting date
+    if (isNaN(date.getTime())) {
+        throw new Error('Invalid date calculated');
+    }
+
     // Format as YYYY-MM-DD
     const month = (date.getMonth() + 1).toString().padStart(2, '0');
     const day = date.getDate().toString().padStart(2, '0');
-    
+
     return `${year}-${month}-${day}`;
 }
 
